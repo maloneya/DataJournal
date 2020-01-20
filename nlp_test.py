@@ -2,8 +2,7 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 
 # PARSE TODO
-# Thing = Noun subject 
-# Event = verb root + dependent object
+# Entity = Noun subject 
 def getEntityOrGuess(nlp_doc):
     ents = list(nlp_doc.ents)
     if len(ents) == 0:
@@ -13,10 +12,20 @@ def getEntityOrGuess(nlp_doc):
     
     return ents[0].text
 
-def getEvent(nlp_doc):
-    for token in nlp_doc:
-        if token.pos_ == "VERB":
-            return token.text
+def getEvent(doc):
+    """Finds verb and dependent object"""
+
+    root = ""
+    for token in doc:
+        if (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT":
+            root = token
+        
+    dependent_object = ""
+    for chunk in doc.noun_chunks:
+        if chunk.root.dep_ == "dobj" and chunk.root.head.text == root.text:
+            dependent_object = chunk.text
+
+    return root.text + " " + dependent_object
 
 def parseSentence(sentence, show_debug_output=False):
     doc = nlp(sentence)
@@ -43,7 +52,7 @@ if __name__ == "__main__":
     sentences = [
     "I read The Pale King",
     "last week I took a trip to California",
-    "Yesterday I had coffee with Rachel at Herkimer and read Dune",
+    "Yesterday I had coffee with Rachel at Herkimer",
     "Autonomous cars shift insurance liability toward manufacturers"
     ]
 
@@ -54,4 +63,4 @@ if __name__ == "__main__":
     sentence_idx = int(input())
     event_entity = parseSentence(sentences[sentence_idx], True)
     print("=====output=====")
-    print ("Entity, verb", event_entity)
+    print ("Event, Entity", event_entity)
