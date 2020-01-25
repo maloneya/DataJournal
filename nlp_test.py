@@ -11,7 +11,7 @@ class SentenceParser:
         self.event = self.getEvent()
         
         if (debug):
-            self.showDebug()
+            self._showDebug()
 
     def getActors(self):
         pass
@@ -19,9 +19,14 @@ class SentenceParser:
     def getEntity(self):
         pobj = ""
         for token in self.doc:
+            if self._isParsed(token.text):
+                continue
+
             if token.dep_ == "pobj":
                 pobj = token.text
-
+                self._setParsed(token.text)
+                break 
+            
         return pobj
 
     def getEvent(self):
@@ -29,17 +34,34 @@ class SentenceParser:
 
         root = ""
         for token in self.doc:
+            if self._isParsed(token.text):
+                continue
+
             if (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT":
                 root = token
+                self._setParsed(token.text)
+                break
 
         dependent_object = ""
         for chunk in self.doc.noun_chunks:
+            if self._isParsed(chunk.text):
+                continue
+            
             if chunk.root.dep_ == "dobj" and chunk.root.head.text == root.text:
                 dependent_object = chunk.text
+                self._setParsed(chunk.text)
+                break 
 
         return root.text + " " + dependent_object
 
-    def showDebug(self):
+    def _isParsed(self, token_text):
+        return self.parsed_tokens.get(token_text, False) 
+
+    def _setParsed(self, token_text):
+        self.parsed_tokens[token_text] = True
+            
+
+    def _showDebug(self):
         print("DEBUG DUMP")
         print("=======Token Info=========")
         print("text", "pos", "tag", "dep", "children")
