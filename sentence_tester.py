@@ -1,10 +1,9 @@
 from nlp_test import parseSentence
 
 input_output = [
-  ["I read The Pale King","read" , "The Pale King"],
   ["last week I took a trip to California", "took a trip", "California"],
   ["Yesterday I had coffee with Rachel at Herkimer", "had coffee", "Herkimer"],
-  ["Autonomous cars shift insurance liability toward manufacturers", "shift insurance liability", "Autonomous cars"]
+  ["Autonomous cars shift insurance liability toward manufacturers", "shift insurance liability", "manufacturers"]
 ]
 
 def runTest(test_case):

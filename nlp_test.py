@@ -3,14 +3,13 @@ nlp = spacy.load("en_core_web_sm")
 
 # PARSE TODO
 # Entity = Noun subject 
-def getEntityOrGuess(nlp_doc):
-    ents = list(nlp_doc.ents)
-    if len(ents) == 0:
-        for token in nlp_doc:
-            if token.pos_ == "NOUN":
-                return token.text
-    
-    return ents[0].text
+def getEntity(doc):
+    pobj = ""
+    for token in doc:
+        if token.dep_ == "pobj":
+            pobj = token.text
+
+    return pobj
 
 def getEvent(doc):
     """Finds verb and dependent object"""
@@ -19,7 +18,7 @@ def getEvent(doc):
     for token in doc:
         if (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT":
             root = token
-        
+
     dependent_object = ""
     for chunk in doc.noun_chunks:
         if chunk.root.dep_ == "dobj" and chunk.root.head.text == root.text:
@@ -31,7 +30,7 @@ def parseSentence(sentence, show_debug_output=False):
     doc = nlp(sentence)
     if show_debug_output:
         showDebug(doc)
-    return [getEvent(doc), getEntityOrGuess(doc)]
+    return [getEvent(doc), getEntity(doc)]
 
 
 def showDebug(doc):
@@ -46,6 +45,11 @@ def showDebug(doc):
     print("text", "root", "root dep", "root head text")
     for chunk in doc.noun_chunks:
         print(chunk.text, chunk.root.text, chunk.root.dep_, chunk.root.head.text)
+
+    print("======Recognized Entities=======")
+    print("text, label")
+    for ent in doc.ents:
+            print(ent.text, ent.label_)
 
 if __name__ == "__main__":
     # eventually we should track actor too 
