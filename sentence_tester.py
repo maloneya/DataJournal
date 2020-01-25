@@ -1,4 +1,4 @@
-from nlp_test import parseSentence
+from nlp_test import SentenceParser
 
 input_output = [
   ["last week I took a trip to California", "took a trip", "California"],
@@ -10,12 +10,12 @@ def runTest(test_case):
     sentence, event, entity = [val for val in test_case]
     print("Case: ", sentence)
     print("Expected", event, entity)
-    actual_event_entity = parseSentence(sentence)
-    if actual_event_entity[0] != event:
-        print("FAIL: event doenst match, got", actual_event_entity[0])
+    actual = SentenceParser(sentence)
+    if actual.event != event:
+        print("FAIL: event doenst match, got", actual.event)
         return
-    if actual_event_entity[1] != entity:
-        print("FAIL: entity doenst match, got", actual_event_entity[1])
+    if actual.entity != entity:
+        print("FAIL: entity doenst match, got", actual.entity)
         return
     print("PASSED")
 
