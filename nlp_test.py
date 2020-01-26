@@ -19,10 +19,7 @@ class SentenceParser:
 
     def getEntity(self):
         pobj = ""
-        for token in self.doc:
-            if self._isParsed(token.text):
-                continue
-
+        for token in self.unparsedTokens(self.doc):
             if token.dep_ == "pobj":
                 pobj = token.text
                 self._setParsed(token.text)
@@ -34,26 +31,27 @@ class SentenceParser:
         """Finds verb and dependent object"""
 
         root = ""
-        for token in self.doc:
-            if self._isParsed(token.text):
-                continue
-
+        for token in self.unparsedTokens(self.doc):
             if (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT":
                 root = token.text
                 self._setParsed(token.text)
                 break
 
         dependent_object = "" 
-        for chunk in self.doc.noun_chunks:
-            if self._isParsed(chunk.text):
-                continue
-            
+        for chunk in self.unparsedTokens(self.doc.noun_chunks):
             if chunk.root.dep_ == "dobj" and chunk.root.head.text == root:
                 dependent_object = chunk.text
                 self._setParsed(chunk.text)
                 break 
 
         return root + " " + dependent_object
+
+    def unparsedTokens(self, iterable):
+        for token in iterable: 
+            if self._isParsed(token.text):
+                continue 
+
+            yield token 
 
     def _isParsed(self, token_text):
         return self.parsed_tokens.get(token_text, False) 
