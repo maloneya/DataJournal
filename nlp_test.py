@@ -18,33 +18,31 @@ class SentenceParser:
         pass
 
     def getEntity(self):
-        pobj = ""
-        for token in self.unparsedTokens(self.doc):
-            if token.dep_ == "pobj":
-                pobj = token.text
-                self._setParsed(token.text)
-                break 
-            
+        pobj = self.findToken(self.doc, lambda token: token.dep_ == "pobj")
         return pobj
 
     def getEvent(self):
         """Finds verb and dependent object"""
 
-        root = ""
-        for token in self.unparsedTokens(self.doc):
-            if (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT":
-                root = token.text
-                self._setParsed(token.text)
-                break
+        root = self.findToken(
+                self.doc, 
+                lambda token: (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT"
+        )
 
-        dependent_object = "" 
-        for chunk in self.unparsedTokens(self.doc.noun_chunks):
-            if chunk.root.dep_ == "dobj" and chunk.root.head.text == root:
-                dependent_object = chunk.text
-                self._setParsed(chunk.text)
-                break 
+        dependent_object = self.findToken(
+                self.doc.noun_chunks,
+                lambda chunk: chunk.root.dep_ == "dobj" and chunk.root.head.text == root
+        )
 
         return root + " " + dependent_object
+
+    def findToken(self, container, match_rule):
+        for token in self.unparsedTokens(container):
+            if match_rule(token):
+                self._setParsed(token.text)
+                return token.text
+
+        return ""
 
     def unparsedTokens(self, iterable):
         for token in iterable: 
