@@ -38,21 +38,21 @@ class SentenceParser:
                 continue
 
             if (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT":
-                root = token
+                root = token.text
                 self._setParsed(token.text)
                 break
 
-        dependent_object = ""
+        dependent_object = "" 
         for chunk in self.doc.noun_chunks:
             if self._isParsed(chunk.text):
                 continue
             
-            if chunk.root.dep_ == "dobj" and chunk.root.head.text == root.text:
+            if chunk.root.dep_ == "dobj" and chunk.root.head.text == root:
                 dependent_object = chunk.text
                 self._setParsed(chunk.text)
                 break 
 
-        return root.text + " " + dependent_object
+        return root + " " + dependent_object
 
     def _isParsed(self, token_text):
         return self.parsed_tokens.get(token_text, False) 
