@@ -1,4 +1,5 @@
 import spacy
+from test_data import input_output
 nlp = spacy.load("en_core_web_sm")
 
 
@@ -83,19 +84,11 @@ class SentenceParser:
     
 
 if __name__ == "__main__":
-    # eventually we should track actor too 
-    sentences = [
-    "I read The Pale King",
-    "last week I took a trip to California",
-    "Yesterday I had coffee with Rachel at Herkimer",
-    "Autonomous cars shift insurance liability toward manufacturers"
-    ]
-
     print("select input")
-    for i,s in enumerate (sentences): 
-        print(i, s)
+    for i,s in enumerate (input_output): 
+        print(i, s[0])
 
     sentence_idx = int(input())
-    parser  = SentenceParser(sentences[sentence_idx], True)
+    parser  = SentenceParser(input_output[sentence_idx][0], True)
     print("=====output=====")
     print ("Actors, Event, Entity", parser.actors, parser.event, parser.entity)
