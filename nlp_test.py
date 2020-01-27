@@ -7,34 +7,8 @@ class SentenceParser:
     def __init__(self, sentence, debug=False):
         self.doc = nlp(sentence)
         self.parsed_tokens = {}
-        self.actors = self.getActors()
-        self.entity = self.getEntity()
-        self.event = self.getEvent()
-        
         if (debug):
             self._showDebug()
-
-    def getActors(self):
-        pass
-
-    def getEntity(self):
-        pobj = self.findToken(self.doc, lambda token: token.dep_ == "pobj")
-        return pobj
-
-    def getEvent(self):
-        """Finds verb and dependent object"""
-
-        root = self.findToken(
-                self.doc, 
-                lambda token: (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT"
-        )
-
-        dependent_object = self.findToken(
-                self.doc.noun_chunks,
-                lambda chunk: chunk.root.dep_ == "dobj" and chunk.root.head.text == root
-        )
-
-        return root + " " + dependent_object
 
     def findToken(self, container, match_rule):
         for token in self.unparsedTokens(container):
@@ -77,7 +51,34 @@ class SentenceParser:
                 print(ent.text, ent.label_)
 
 
-    
+class EntityEventActorParser(SentenceParser):
+    def __init__(self, sentence, debug=False):
+        super().__init__(sentence, debug) 
+        self.actors = self.getActors()
+        self.entity = self.getEntity()
+        self.event = self.getEvent()
+        
+    def getActors(self):
+        pass
+
+    def getEntity(self):
+        return self.findToken(self.doc, lambda token: token.dep_ == "pobj")
+
+    def getEvent(self):
+        """Finds verb and dependent object"""
+
+        root = self.findToken(
+                self.doc, 
+                lambda token: (token.pos_ == "VERB" or token.pos_ == "AUX") and token.dep_ == "ROOT"
+        )
+
+        dependent_object = self.findToken(
+                self.doc.noun_chunks,
+                lambda chunk: chunk.root.dep_ == "dobj" and chunk.root.head.text == root
+        )
+        return root + " " + dependent_object
+
+
 
 if __name__ == "__main__":
     print("select input")
@@ -85,6 +86,6 @@ if __name__ == "__main__":
         print(i, s[0])
 
     sentence_idx = int(input())
-    parser  = SentenceParser(input_output[sentence_idx][0], True)
+    parser  = EntityEventActorParser(input_output[sentence_idx][0], True)
     print("=====output=====")
     print ("Actors, Event, Entity", parser.actors, parser.event, parser.entity)
