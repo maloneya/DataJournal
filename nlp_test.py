@@ -10,6 +10,16 @@ class SentenceParser:
         if (debug):
             self._showDebug()
 
+    def findAllTokens(self, container, match_rule):
+        tokens = []
+        for token in self.unparsedTokens(container):
+            if match_rule(token):
+                self._setParsed(token.text)
+                tokens.append(token)
+
+        return tokens
+
+
     def findToken(self, container, match_rule):
         for token in self.unparsedTokens(container):
             if match_rule(token):
@@ -59,7 +69,7 @@ class EntityEventActorParser(SentenceParser):
         self.event = self.getEvent()
         
     def getActors(self):
-        return self.findToken(self.doc.ents, lambda ent: ent.label_ == 'PERSON')
+        return self.findAllTokens(self.doc.ents, lambda ent: ent.label_ == 'PERSON')
 
     def getEntity(self):
         return self.findToken(self.doc, lambda token: token.dep_ == "pobj")
