@@ -59,7 +59,7 @@ class EntityEventActorParser(SentenceParser):
         self.event = self.getEvent()
         
     def getActors(self):
-        pass
+        return self.findToken(self.doc.ents, lambda ent: ent.label_ == 'PERSON')
 
     def getEntity(self):
         return self.findToken(self.doc, lambda token: token.dep_ == "pobj")
