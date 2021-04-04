@@ -13,6 +13,7 @@ type ParseFn func(*http.Request) (Query, error)
 
 type Query interface {
 	Query() (string, map[string]interface{})
+	Record()
 }
 
 type StorageRequest struct {
