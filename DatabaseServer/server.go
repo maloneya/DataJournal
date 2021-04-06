@@ -12,10 +12,12 @@ import (
 type ParseFn func(*http.Request) (Query, error)
 
 type Query interface {
+	// Query returns the cypher string, the query params
 	Query() (string, map[string]interface{})
-	Record()
 }
 
+// This needs to be aligned with the structs in the schema package
+// The write and read path need to be aligned on db schema to avoid typing issues.
 type StorageRequest struct {
 	Actor  string
 	Event  string
@@ -44,7 +46,7 @@ type GetActorRequest struct {
 }
 
 func (req GetActorRequest) Query() (query string, params map[string]interface{}) {
-	query = "match (:actor {name: $actor})-[r]->() return r"
+	query = "match p=(:actor {name: $actor})-[]->() return p"
 	params = map[string]interface{}{"actor": req.Actor}
 	return
 }
@@ -85,9 +87,15 @@ func CreateDBQueryHandler(parser ParseFn, driver neo4j.Driver) func(http.Respons
 			fmt.Fprintf(w, "DB Call failed %v\n", err.Error())
 			return
 		}
-		//todo result formatting!
+
 		for _, rec := range records {
-			fmt.Fprintf(w, "%v", rec)
+			path, ok := rec.Get("p")
+			if !ok {
+				fmt.Fprintf(w, "Error Getting path type\n")
+				continue
+			}
+
+			fmt.Fprintf(w, "%+v", path)
 		}
 	}
 }

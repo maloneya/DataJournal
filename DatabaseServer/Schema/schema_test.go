@@ -24,7 +24,7 @@ func TestDecode(t *testing.T) {
 	}
 
 	var x TestStruct
-	err := Decode(record, &x)
+	err := Decode(&record, &x)
 	if err != nil {
 		t.Errorf("Decode err: %v\n", err)
 	}

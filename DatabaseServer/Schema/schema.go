@@ -12,7 +12,34 @@ type Actor struct {
 	Name string
 }
 
-func Decode(record neo4j.Record, target interface{}) error {
+type GraphObj interface {
+	GetType() string
+}
+
+func (r neo4j.Relationship) GetType() string {
+	return r.Type
+}
+
+func (n neo4j.Node) GetType() string {
+	return n.Labels[0]
+}
+
+//does this return copies??
+var typeToStruct = map[string]interface{}{
+	"actor": Actor{},
+}
+
+func GetStructForLabel(o GraphObj) (interface{}, error) {
+	objType := o.GetType()
+	str, ok := typeToStruct[kind.(string)]
+	if !ok {
+		return nil, fmt.Errorf("Unknown type %v\n", kind)
+	}
+
+	return str, nil
+}
+
+func Decode(record *neo4j.Record, target interface{}) error {
 	//check that the passed in target is a struct
 	t := reflect.ValueOf(target).Elem()
 	if t.Kind() != reflect.Struct {
