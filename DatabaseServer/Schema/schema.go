@@ -7,9 +7,12 @@ import (
 	"github.com/neo4j/neo4j-go-driver/v4/neo4j"
 )
 
-// DB schemas
-type Actor struct {
-	Name string
+type Schema interface {
+	// Insert returns cypher string that can insert the record into the db,
+	Insert() string
+
+	// Get returns cypher string that can get the record from the db,
+	Get() string
 }
 
 type GraphObj interface {
@@ -25,6 +28,7 @@ type GraphObj interface {
 // }
 //
 // //does this return copies??
+// //todo this map should be auto generated from the schemas.
 // var typeToStruct = map[string]interface{}{
 // 	"actor": Actor{},
 // }
