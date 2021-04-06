@@ -1,0 +1,7 @@
+--- 
+name: "Test"
+fields: 
+ - name: "foo"
+   type: "string"
+ - name: "bar"
+   type: "int"

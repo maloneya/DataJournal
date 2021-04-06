@@ -1,0 +1,2 @@
+This directory is intended to contain the output from schema_gen.go. 
+Schema definitions defined in Schema/Schemas will be complied into go code and stored in this dir

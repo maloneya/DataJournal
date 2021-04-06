@@ -37,3 +37,10 @@ func TestDecode(t *testing.T) {
 		t.Errorf("field Bar expected 1 got %v\n", x.Bar)
 	}
 }
+
+func TestGen(t *testing.T) {
+	err := Generate()
+	if err != nil {
+		t.Errorf("%v", err)
+	}
+}
